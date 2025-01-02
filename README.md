@@ -38,3 +38,19 @@ If we want to use attribute from resource we need to use ${} inside string. For 
 ```bash
 resources = ["${aws_s3_bucket.bucket_frontend.arn}/*"]
 ```
+
+# Backend in S3
+
+Deploying tfstate file to S3 allows us to share state file with fellow devs/ops. Another advantage is that we can set lock on it, so that only one person can modify it at the time.
+
+If we already have local state, we need to run `terraform init`. Terraform will then migrate local state into remote s3e bucket. 
+
+It is good practice to do `terraform refresh` state (`refresh` is deprecated use terraform apply -refresh-only)
+
+Refresh will only `tfstate` file according to actual infrastructure, but IT DOES NOT UPDATE tf files. It need to be done manually.
+
+## Locking remote state
+
+Locking is required, because it prevents from modifing resources by multiple ops at the same time. We can achieve locking by creating special table LockID in dynamoDB. 
+
+For more reference check https://developer.hashicorp.com/terraform/language/backend/s3
