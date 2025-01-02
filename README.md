@@ -30,3 +30,11 @@ We can now see this dependencies by running `terraform graph`.
 
 If we use attribute that is returned (for example id check https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block#attribute-reference)
 we then do not need dependencies.
+
+# Inject reference of resource into string 
+
+If we want to use attribute from resource we need to use ${} inside string. For example:
+
+```bash
+resources = ["${aws_s3_bucket.bucket_frontend.arn}/*"]
+```
