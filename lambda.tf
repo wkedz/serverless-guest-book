@@ -72,3 +72,11 @@ data "archive_file" "lambda_package" {
   output_path = "./backend.zip"
   source_dir  = "./backend"
 }
+
+resource "aws_lambda_permission" "resource_based_policy" {
+  statement_id  = "HTTPApiInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_backend.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*"
+}
