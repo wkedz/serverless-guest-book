@@ -1,5 +1,5 @@
 terraform {
-  required_version = "1.10.3"
+  required_version = "1.10.4"
 
   required_providers {
     aws = {
@@ -9,9 +9,9 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "terraform-state-source"
-    key = "terraform.tfstate"
-    region = "eu-north-1"
+    bucket         = "terraform-state-source"
+    key            = "terraform.tfstate"
+    region         = "eu-north-1"
     dynamodb_table = "terraform-state-source"
   }
 }
