@@ -13,6 +13,24 @@ resource "aws_iam_role_policy_attachment" "policy_attachment" {
   policy_arn = aws_iam_policy.policy.arn
 }
 
+resource "aws_lambda_function" "lambda_backend" {
+  filename      = "./backend.zip"
+  function_name = "backend"
+  role          = aws_iam_role.role.arn
+  # Name of the function that handles event
+  handler = "main.handler"
+  runtime = "python3.8"
+
+  # Update new function, if we update the source code
+  source_code_hash = data.archive_file.lambda_package.output_base64sha256
+
+  environment {
+    variables = {
+      TABLE_NAME = aws_dynamodb_table.dynamodb_table.name
+    }
+  }
+}
+
 data "aws_iam_policy_document" "policy" {
   statement {
     sid    = "ReadWriteDynamoDB"
@@ -47,4 +65,10 @@ data "aws_iam_policy_document" "assume_role_policy" {
       identifiers = ["lambda.amazonaws.com"]
     }
   }
+}
+
+data "archive_file" "lambda_package" {
+  type        = "zip"
+  output_path = "./backend.zip"
+  source_dir  = "./backend"
 }
