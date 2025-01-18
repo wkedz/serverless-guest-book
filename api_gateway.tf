@@ -1,5 +1,5 @@
 resource "aws_apigatewayv2_api" "api" {
-  name          = "backend"
+  name          = var.api_gateway_name
   protocol_type = "HTTP"
 }
 
@@ -8,21 +8,21 @@ resource "aws_apigatewayv2_integration" "intergration" {
   # Because we want to access another resource we need to use AWS_PROXY
   integration_type = "AWS_PROXY"
   # Because we are accessing api gateway from inthernet. For inthranet use VPC_LINK.
-  connection_type    = "INTERNET"
-  integration_method = "POST"
-  integration_uri    = aws_lambda_function.lambda_backend.invoke_arn
-  payload_format_version = "2.0"
+  connection_type        = "INTERNET"
+  integration_method     = "POST"
+  integration_uri        = aws_lambda_function.lambda_backend.invoke_arn
+  payload_format_version = var.lambda_payload_version
 }
 
 resource "aws_apigatewayv2_route" "route_get" {
   api_id    = aws_apigatewayv2_api.api.id
-  route_key = "GET /"
+  route_key = "${var.api_gateway_route_get.http_method} ${var.api_gateway_route_get.route}"
   target    = "integrations/${aws_apigatewayv2_integration.intergration.id}"
 }
 
 resource "aws_apigatewayv2_route" "route_post" {
   api_id    = aws_apigatewayv2_api.api.id
-  route_key = "POST /"
+  route_key = "${var.api_gateway_route_post.http_method} ${var.api_gateway_route_post.route}"
   target    = "integrations/${aws_apigatewayv2_integration.intergration.id}"
 }
 

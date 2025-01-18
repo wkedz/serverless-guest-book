@@ -36,3 +36,34 @@ Refresh will only `tfstate` file according to actual infrastructure, but IT DOES
 Locking is required, because it prevents from modifing resources by multiple ops at the same time. We can achieve locking by creating special table LockID in dynamoDB. 
 
 For more reference check https://developer.hashicorp.com/terraform/language/backend/s3
+
+# Variables
+
+In order to customize stack, we can use variables block 
+```tf
+variable "NAME" {
+
+}
+```
+
+If no name is provided Terraform will ask for one. We can either set it by providing -var="NAME=VALUE" during apply/plan
+
+## Variable types
+
+Any
+Bool
+Number
+String
+List
+Set
+Map
+Object
+tuple
+
+## Set variables by file
+
+It is possile to define variables values by using *.tfvars . In order to use it, you need to pass it by -var-file=PATH-TO-TFVARS.tfvars
+
+We can load it automaticlly, we just need to change name from PATH-TO-TFVARS.tfvars to PATH-TO-TFVARS.auto.tfvars Terraform will then load this file automatically, without a need of passing it -var-file. This is for the situation when name of this file is different than terraform.tfvars.
+
+This file name - terraform.tfvars, will work automatically.
