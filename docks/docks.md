@@ -149,7 +149,7 @@ resource "aws_s3_bucket_access_block" "access_blocks" {
     key1 = "value1"
     key2 = "value2"
   }
-  bucket = aws_s3_bucket.some_bucket[each.key].id
+  bucket = aws_s3_bucket.some_bucket["${each.key}"].id
 
 }
 ```

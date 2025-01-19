@@ -1,6 +1,11 @@
 resource "aws_apigatewayv2_api" "api" {
   name          = var.api_gateway_name
   protocol_type = "HTTP"
+  cors_configuration {
+    allow_origins = [
+      "http://${aws_s3_bucket_website_configuration.website.website_endpoint}"
+    ]
+  }
 }
 
 resource "aws_apigatewayv2_integration" "intergration" {
