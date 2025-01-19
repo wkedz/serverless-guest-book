@@ -68,3 +68,88 @@ We can load it automaticlly, we just need to change name from PATH-TO-TFVARS.tfv
 
 This file name - terraform.tfvars, will work automatically.
 
+# Loops
+
+## Count
+
+Loop `count` allow us to make N resoureces `count=N` . It then give us a special attirbute `count.index` so that we can use it to customize resource name. 
+
+```tf
+resource "aws_s3_bucket" "bucket" {
+    count = 3
+    bucket = "some-random-name-${count-index}"
+}
+```
+
+This code will create 3 s3 buckets:
+* some-random-name-0
+* some-random-name-1
+* some-random-name-2
+
+## for_each
+
+This is a loop that allow us to create n resources, based on the number of key-value occurenc in for_each block, for example:
+
+```tf
+resource "aws_s3_bucket" "loop" {
+  for_each = {
+    first_key  = "first_key_value"
+    second_key = "second_key_value"
+    third_key  = "third_key_value"
+  }
+  bucket = "loop-bucket-${each.key}-${each.value}"
+}
+```
+
+This will create the following buckets:
+* loop-bucket-first_key-first_key_value,
+* loop-bucket-second_key-second_key_value,
+* loop-bucket-thirdt_key-third_key_value,
+
+## Refering resources created by count
+
+If we want to target a whole resource created by `count` we need to create count insisde that resource and use `count.index` or use [INDEX]. For example:
+
+```tf
+resource "aws_s3_bucker" "some_bucket" {
+  count = 3
+  ...
+}
+
+resource "aws_s3_bucket_access_block" "access_blocks" {
+  # USE PRECISE ONE
+  bucket = aws_s3_bucket.some_bucket[INDEX].id
+
+  # USE ALL
+  count = 3
+  bucket = aws_s3_bucket.some_bucket[count.index].id
+
+}
+```
+
+## Refering resources created by for_each
+
+Very similar as for `count`. In this case we can create same for_each block in both resources, or use index with key name.
+
+```tf
+resource "aws_s3_bucker" "some_bucket" {
+  for_each = {
+    key1 = "value1"
+    key2 = "value2"
+  }
+  ...
+}
+
+resource "aws_s3_bucket_access_block" "access_blocks" {
+  # USE PRECISE ONE
+  bucket = aws_s3_bucket.some_bucket["key1"].id # NOTICE THAT THERE IS A BRACKET
+
+  # USE ALL
+  for_each = {
+    key1 = "value1"
+    key2 = "value2"
+  }
+  bucket = aws_s3_bucket.some_bucket[each.key].id
+
+}
+```
