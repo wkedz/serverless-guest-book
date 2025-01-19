@@ -52,6 +52,6 @@ resource "aws_s3_bucket_website_configuration" "website" {
   bucket = aws_s3_bucket.bucket_frontend.id
 
   index_document {
-    suffix = "index.html"
+    suffix = var.application == "client" ? "index.html" : "index2.html"
   }
 }

@@ -169,3 +169,19 @@ dynamic "statement" {
 We cannot put reference to resource attribute in tfvars, we need to do it inside locals.
 
 When we are using values from for_each insisde dynamic block, we do not use standard each.key/value, but use name of dynamic block for example statement.key/value (because we use dynamic "statement")
+
+## Conditionals
+
+In order to create condifiton we can use "Elvis operator? :
+CONDITION ? TRUE_VALUES : FALSE_VALUES
+
+We cannot use it directly to create of not resources, but we can use combination of conditional and count loop.
+
+```tf
+resource ... {
+    count = var.some_logic ? 1 : 0
+...
+}
+```
+
+If var.some_logic is true, Terraform will then create this resource

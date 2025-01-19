@@ -126,3 +126,7 @@ variable "main_bucket_public_access_block" {
   }
   nullable = false
 }
+
+variable "application" {
+  type = string
+}
