@@ -153,3 +153,19 @@ resource "aws_s3_bucket_access_block" "access_blocks" {
 
 }
 ```
+
+## Creating dynamic content
+
+Terraform allows us to create dynamic blocks. We can parametrize block for example by using for_each. We can create for example "statement" blocks. 
+
+```tf
+
+dynamic "statement" {
+    for_each = {}
+    content
+}
+```
+
+We cannot put reference to resource attribute in tfvars, we need to do it inside locals.
+
+When we are using values from for_each insisde dynamic block, we do not use standard each.key/value, but use name of dynamic block for example statement.key/value (because we use dynamic "statement")

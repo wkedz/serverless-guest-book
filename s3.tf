@@ -49,9 +49,9 @@ resource "aws_s3_object" "name" {
 }
 
 resource "aws_s3_bucket_website_configuration" "website" {
-  bucket       = aws_s3_bucket.bucket_frontend.id
+  bucket = aws_s3_bucket.bucket_frontend.id
 
   index_document {
     suffix = "index.html"
-  }  
+  }
 }

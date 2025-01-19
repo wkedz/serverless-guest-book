@@ -32,27 +32,14 @@ resource "aws_lambda_function" "lambda_backend" {
 }
 
 data "aws_iam_policy_document" "policy" {
-  statement {
-    sid    = "ReadWriteDynamoDB"
-    effect = "Allow"
-    actions = [
-      "dynamoDB:Scan",
-      "dynamoDB:PutItem",
-    ]
-    resources = [
-      aws_dynamodb_table.dynamodb_table.arn
-    ]
-  }
-
-  statement {
-    sid    = "AllowLogging"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-    resources = ["*"]
+  dynamic "statement" {
+    for_each = local.lambda_policy
+    content {
+      sid       = statement.key
+      effect    = statement.value.effect
+      actions   = statement.value.actions
+      resources = statement.value.resources
+    }
   }
 }
 
