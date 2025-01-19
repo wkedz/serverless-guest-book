@@ -67,3 +67,4 @@ It is possile to define variables values by using *.tfvars . In order to use it,
 We can load it automaticlly, we just need to change name from PATH-TO-TFVARS.tfvars to PATH-TO-TFVARS.auto.tfvars Terraform will then load this file automatically, without a need of passing it -var-file. This is for the situation when name of this file is different than terraform.tfvars.
 
 This file name - terraform.tfvars, will work automatically.
+

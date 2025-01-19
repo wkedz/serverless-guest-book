@@ -1,14 +1,14 @@
 resource "aws_s3_bucket" "bucket_frontend" {
-  bucket = "frontend-terraform-demo"
+  bucket = var.main_bucket_name
 }
 
 resource "aws_s3_bucket_public_access_block" "bucket_frontend_public_access" {
   bucket = aws_s3_bucket.bucket_frontend.id
 
-  block_public_acls       = true
-  block_public_policy     = false
-  ignore_public_acls      = true
-  restrict_public_buckets = false
+  block_public_acls       = var.main_bucket_public_access_block.block_public_acls
+  block_public_policy     = var.main_bucket_public_access_block.block_public_policy
+  ignore_public_acls      = var.main_bucket_public_access_block.ignore_public_acls
+  restrict_public_buckets = var.main_bucket_public_access_block.restrict_public_buckets
 
   # Only if we give raw name of bucket:
   # bucket = "frontend-terraform-demo"

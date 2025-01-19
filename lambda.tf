@@ -1,10 +1,10 @@
 resource "aws_iam_policy" "policy" {
-  name   = "backend-lambda-policy"
+  name   = var.lambda_policy_name
   policy = data.aws_iam_policy_document.policy.json
 }
 
 resource "aws_iam_role" "role" {
-  name               = "backend-lambda-role"
+  name               = var.lambda_role_name
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 }
 
@@ -14,11 +14,11 @@ resource "aws_iam_role_policy_attachment" "policy_attachment" {
 }
 
 resource "aws_lambda_function" "lambda_backend" {
-  filename      = "./backend.zip"
-  function_name = "backend"
+  filename      = "./${var.lambda_source_file_name}.zip"
+  function_name = var.lambda_function_name
   role          = aws_iam_role.role.arn
   # Name of the function that handles event
-  handler = "main.handler"
+  handler = var.lambda_handler_name
   runtime = "python3.8"
 
   # Update new function, if we update the source code
@@ -69,8 +69,8 @@ data "aws_iam_policy_document" "assume_role_policy" {
 
 data "archive_file" "lambda_package" {
   type        = "zip"
-  output_path = "./backend.zip"
-  source_dir  = "./backend"
+  output_path = "./${var.lambda_source_file_name}.zip"
+  source_dir  = var.lambda_source_dir
 }
 
 resource "aws_lambda_permission" "resource_based_policy" {
