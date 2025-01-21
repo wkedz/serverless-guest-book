@@ -1,17 +1,7 @@
-resource "aws_iam_role" "role" {
-  name               = var.lambda_role_name
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
-}
-
-resource "aws_iam_role_policy_attachment" "policy_attachment" {
-  role       = aws_iam_role.role.name
-  policy_arn = module.iam_policy["backend-lambda-policy"].policy_arn
-}
-
 resource "aws_lambda_function" "lambda_backend" {
   filename      = "./${var.lambda_source_file_name}.zip"
   function_name = var.lambda_function_name
-  role          = aws_iam_role.role.arn
+  role          = module.iam_roles["backend-lambda-role"].arn
   # Name of the function that handles event
   handler = var.lambda_handler_name
   runtime = "python3.8"
@@ -22,17 +12,6 @@ resource "aws_lambda_function" "lambda_backend" {
   environment {
     variables = {
       TABLE_NAME = aws_dynamodb_table.dynamodb_table.name
-    }
-  }
-}
-
-data "aws_iam_policy_document" "assume_role_policy" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
     }
   }
 }
@@ -58,4 +37,14 @@ module "iam_policy" {
 
   name       = each.key
   statements = each.value
+}
+
+module "iam_roles" {
+  source = "./modules/iam_role"
+
+  for_each = var.iam_roles
+
+  name = each.key
+  trust_relationship_principals = each.value.trust_relationship_principals
+  policy_arn = module.iam_policy[each.value.attach_policy].policy_arn
 }

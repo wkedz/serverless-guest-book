@@ -123,3 +123,10 @@ variable "main_bucket_public_access_block" {
 variable "application" {
   type = string
 }
+
+variable "iam_roles" {
+  type = map(object({
+    trust_relationship_principals = map(set(string))
+    attach_policy = string
+  }))
+}

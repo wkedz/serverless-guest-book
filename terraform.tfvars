@@ -32,3 +32,13 @@ main_bucket_public_access_block = {
   restrict_public_buckets = false
 }
 application = "client"
+
+# Roles
+iam_roles = {
+  backend-lambda-role = {
+    trust_relationship_principals = {
+      Service = ["lambda.amazonaws.com"]
+    }
+    attach_policy = "backend-lambda-policy"
+  }
+}
