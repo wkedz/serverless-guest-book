@@ -62,13 +62,6 @@ variable "dynamodb_write_capacity" {
   nullable    = false
 }
 
-# Lambda
-variable "lambda_policy_name" {
-  type        = string
-  description = "Name of policy used by Lambda"
-  nullable    = false
-}
-
 variable "lambda_role_name" {
   type        = string
   description = "Name of role used by Lambda"

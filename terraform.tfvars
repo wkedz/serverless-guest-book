@@ -17,7 +17,6 @@ dynamodb_read_capacity  = 1
 dynamodb_write_capacity = 1
 
 # Lambda
-lambda_policy_name      = "backend-lambda-policy"
 lambda_role_name        = "backend-lambda-role"
 lambda_source_dir       = "./backend"
 lambda_source_file_name = "backend"
