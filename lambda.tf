@@ -5,7 +5,7 @@ resource "aws_iam_role" "role" {
 
 resource "aws_iam_role_policy_attachment" "policy_attachment" {
   role       = aws_iam_role.role.name
-  policy_arn = module.lambda_policy.policy_arn
+  policy_arn = module.iam_policy["backend-lambda-policy"].policy_arn
 }
 
 resource "aws_lambda_function" "lambda_backend" {
@@ -51,9 +51,11 @@ resource "aws_lambda_permission" "resource_based_policy" {
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*"
 }
 
-module "lambda_policy" {
+module "iam_policy" {
   source = "./modules/iam_policy"
 
-  name = var.lambda_policy_name
-  statements = local.lambda_policy
+  for_each = local.iam_polices
+
+  name       = each.key
+  statements = each.value
 }

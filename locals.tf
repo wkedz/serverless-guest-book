@@ -26,4 +26,28 @@ locals {
       resources = ["*"]
     }
   }
+
+  iam_polices = {
+    backend-lambda-policy = {
+      ReadWriteDynamoDB = {
+        effect = "Allow"
+        actions = [
+          "dynamoDB:Scan",
+          "dynamoDB:PutItem",
+        ]
+        resources = [
+          aws_dynamodb_table.dynamodb_table.arn
+        ]
+      }
+      AllowLogging = {
+        effect = "Allow"
+        actions = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        resources = ["*"]
+      }
+    }
+  }
 }
