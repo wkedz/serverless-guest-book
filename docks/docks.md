@@ -185,3 +185,26 @@ resource ... {
 ```
 
 If var.some_logic is true, Terraform will then create this resource
+
+# Modules
+
+## Providers
+
+We can define out custom providers insisde modules. If not provided, module will inherited providers from root directory.
+
+~> 4.60.0 - all version based on 4.60 will be used. for example 4.60.1, 4.60.2, 4.60.3...
+~> 4.0 - all version based on 4. will be used. for example 4.40, 4.50.2, 4.60.1...
+
+# Moving state
+
+Sometime we would like to move a state from one resource to another. In other case, Terraform would remove it, and then recreate it. So it would be unecessary. In order to do that we need to type 
+
+```bash
+terraform state mv OLD NEW
+```
+
+This happend when we create a module with iam policy.
+
+# Display output of main 
+
+In order to display output of our iac, we need to define outputs.tf which contains all output variables that will be show after plan. It can be then used. This output will also be save in state file. 

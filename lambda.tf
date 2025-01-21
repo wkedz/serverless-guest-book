@@ -1,8 +1,3 @@
-resource "aws_iam_policy" "policy" {
-  name   = var.lambda_policy_name
-  policy = data.aws_iam_policy_document.policy.json
-}
-
 resource "aws_iam_role" "role" {
   name               = var.lambda_role_name
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
@@ -10,7 +5,7 @@ resource "aws_iam_role" "role" {
 
 resource "aws_iam_role_policy_attachment" "policy_attachment" {
   role       = aws_iam_role.role.name
-  policy_arn = aws_iam_policy.policy.arn
+  policy_arn = module.lambda_policy.policy_arn
 }
 
 resource "aws_lambda_function" "lambda_backend" {
@@ -27,18 +22,6 @@ resource "aws_lambda_function" "lambda_backend" {
   environment {
     variables = {
       TABLE_NAME = aws_dynamodb_table.dynamodb_table.name
-    }
-  }
-}
-
-data "aws_iam_policy_document" "policy" {
-  dynamic "statement" {
-    for_each = local.lambda_policy
-    content {
-      sid       = statement.key
-      effect    = statement.value.effect
-      actions   = statement.value.actions
-      resources = statement.value.resources
     }
   }
 }
@@ -66,4 +49,11 @@ resource "aws_lambda_permission" "resource_based_policy" {
   function_name = aws_lambda_function.lambda_backend.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*"
+}
+
+module "lambda_policy" {
+  source = "./modules/iam_policy"
+
+  name = var.lambda_policy_name
+  statements = local.lambda_policy
 }
