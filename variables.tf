@@ -35,39 +35,6 @@ variable "api_gateway_route_post" {
   description = "POST route of API Gateway"
 }
 
-variable "lambda_role_name" {
-  type        = string
-  description = "Name of role used by Lambda"
-  nullable    = false
-}
-
-variable "lambda_source_dir" {
-  type        = string
-  description = "Path to Lambda code"
-  nullable    = false
-}
-
-variable "lambda_source_file_name" {
-  type        = string
-  description = "Source filename of Lambda code"
-  default     = "backend"
-  nullable    = false
-}
-
-variable "lambda_function_name" {
-  type        = string
-  description = "Name of Lambda function"
-  default     = "backend"
-  nullable    = false
-}
-
-variable "lambda_handler_name" {
-  type        = string
-  description = "Name of handler Lambda function"
-  default     = "main.handler"
-  nullable    = false
-}
-
 # Buckets
 variable "main_bucket_name" {
   type        = string

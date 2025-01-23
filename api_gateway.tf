@@ -15,7 +15,7 @@ resource "aws_apigatewayv2_integration" "intergration" {
   # Because we are accessing api gateway from inthernet. For inthranet use VPC_LINK.
   connection_type        = "INTERNET"
   integration_method     = "POST"
-  integration_uri        = aws_lambda_function.lambda_backend.invoke_arn
+  integration_uri        = module.lambda["backend"].invoke_arn
   payload_format_version = var.lambda_payload_version
 }
 

@@ -1,35 +1,3 @@
-resource "aws_lambda_function" "lambda_backend" {
-  filename      = "./${var.lambda_source_file_name}.zip"
-  function_name = var.lambda_function_name
-  role          = module.iam_roles["backend-lambda-role"].arn
-  # Name of the function that handles event
-  handler = var.lambda_handler_name
-  runtime = "python3.8"
-
-  # Update new function, if we update the source code
-  source_code_hash = data.archive_file.lambda_package.output_base64sha256
-
-  environment {
-    variables = {
-      TABLE_NAME = module.dynamodb["comments"].table_name
-    }
-  }
-}
-
-data "archive_file" "lambda_package" {
-  type        = "zip"
-  output_path = "./${var.lambda_source_file_name}.zip"
-  source_dir  = var.lambda_source_dir
-}
-
-resource "aws_lambda_permission" "resource_based_policy" {
-  statement_id  = "HTTPApiInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_backend.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*"
-}
-
 module "iam_policy" {
   source = "./modules/iam_policy"
 
@@ -47,4 +15,18 @@ module "iam_roles" {
   name                          = each.key
   trust_relationship_principals = each.value.trust_relationship_principals
   policy_arn                    = module.iam_policy[each.value.attach_policy].policy_arn
+}
+
+module "lambda" {
+  source = "./modules/lambda"
+
+  for_each = local.lambda_functions
+
+  function_name         = each.key
+  code_dir              = each.value.code_dir
+  execution_role_arn    = module.iam_roles[each.value.execution_role].arn
+  handler_name          = each.value.handler_name
+  runtime_env           = each.value.runtime_env
+  environment_variables = each.value.environment_variables
+  permissions           = each.value.permissions
 }

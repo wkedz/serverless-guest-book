@@ -10,13 +10,6 @@ api_gateway_route_post = {
 }
 lambda_payload_version = "2.0"
 
-# Lambda
-lambda_role_name        = "backend-lambda-role"
-lambda_source_dir       = "./backend"
-lambda_source_file_name = "backend"
-lambda_function_name    = "backend"
-lambda_handler_name     = "main.handler"
-
 # Buckets
 main_bucket_name = "frontend-terraform-demo"
 main_bucket_public_access_block = {
