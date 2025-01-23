@@ -1,14 +1,12 @@
-resource "aws_dynamodb_table" "dynamodb_table" {
-  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dynamodb_table#argument-reference
-  name     = var.dynamodb_table_name
-  hash_key = var.dynamodb_hash_key_name
+module "dynamodb" {
+  source = "./modules/dynamodb"
 
-  attribute {
-    name = var.dynamodb_hash_key_name
-    type = "S"
-  }
+  for_each = var.dynamodb_tables
 
-  billing_mode   = "PROVISIONED"
-  read_capacity  = var.dynamodb_read_capacity
-  write_capacity = var.dynamodb_write_capacity
+  table_name     = each.key
+  hash_key       = each.value.hash_key
+  hash_key_type  = each.value.hash_key_type
+  billing_mode   = each.value.billing_mode
+  read_capacity  = each.value.read_capacity
+  write_capacity = each.value.write_capacity
 }

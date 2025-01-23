@@ -35,33 +35,6 @@ variable "api_gateway_route_post" {
   description = "POST route of API Gateway"
 }
 
-# DynamoDB
-variable "dynamodb_table_name" {
-  type        = string
-  description = "Name of DynamoDB table"
-  nullable    = false
-}
-
-variable "dynamodb_hash_key_name" {
-  type        = string
-  description = "Name of DynamoDB hash key"
-  nullable    = false
-}
-
-variable "dynamodb_read_capacity" {
-  type        = number
-  description = "Value of read capacity of DynamoDB"
-  default     = 1
-  nullable    = false
-}
-
-variable "dynamodb_write_capacity" {
-  type        = number
-  description = "Value of write capacity of DynamoDB"
-  default     = 1
-  nullable    = false
-}
-
 variable "lambda_role_name" {
   type        = string
   description = "Name of role used by Lambda"
@@ -127,6 +100,16 @@ variable "application" {
 variable "iam_roles" {
   type = map(object({
     trust_relationship_principals = map(set(string))
-    attach_policy = string
+    attach_policy                 = string
+  }))
+}
+
+variable "dynamodb_tables" {
+  type = map(object({
+    hash_key       = string
+    hash_key_type  = string
+    billing_mode   = string
+    read_capacity  = number
+    write_capacity = number
   }))
 }

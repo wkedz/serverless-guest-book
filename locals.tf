@@ -5,28 +5,6 @@ locals {
     js   = "text/javascript"
   }
 
-  lambda_policy = {
-    ReadWriteDynamoDB = {
-      effect = "Allow"
-      actions = [
-        "dynamoDB:Scan",
-        "dynamoDB:PutItem",
-      ]
-      resources = [
-        aws_dynamodb_table.dynamodb_table.arn
-      ]
-    }
-    AllowLogging = {
-      effect = "Allow"
-      actions = [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ]
-      resources = ["*"]
-    }
-  }
-
   iam_polices = {
     backend-lambda-policy = {
       ReadWriteDynamoDB = {
@@ -36,7 +14,7 @@ locals {
           "dynamoDB:PutItem",
         ]
         resources = [
-          aws_dynamodb_table.dynamodb_table.arn
+          module.dynamodb["comments"].table_arn
         ]
       }
       AllowLogging = {

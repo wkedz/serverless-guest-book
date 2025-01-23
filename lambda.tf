@@ -11,7 +11,7 @@ resource "aws_lambda_function" "lambda_backend" {
 
   environment {
     variables = {
-      TABLE_NAME = aws_dynamodb_table.dynamodb_table.name
+      TABLE_NAME = module.dynamodb["comments"].table_name
     }
   }
 }
@@ -44,7 +44,7 @@ module "iam_roles" {
 
   for_each = var.iam_roles
 
-  name = each.key
+  name                          = each.key
   trust_relationship_principals = each.value.trust_relationship_principals
-  policy_arn = module.iam_policy[each.value.attach_policy].policy_arn
+  policy_arn                    = module.iam_policy[each.value.attach_policy].policy_arn
 }

@@ -10,12 +10,6 @@ api_gateway_route_post = {
 }
 lambda_payload_version = "2.0"
 
-# DynamoDB
-dynamodb_table_name     = "comments"
-dynamodb_hash_key_name  = "mail"
-dynamodb_read_capacity  = 1
-dynamodb_write_capacity = 1
-
 # Lambda
 lambda_role_name        = "backend-lambda-role"
 lambda_source_dir       = "./backend"
@@ -40,5 +34,17 @@ iam_roles = {
       Service = ["lambda.amazonaws.com"]
     }
     attach_policy = "backend-lambda-policy"
+  }
+}
+
+# Dynamodb
+
+dynamodb_tables = {
+  comments = {
+    hash_key       = "mail"
+    hash_key_type  = "string"
+    billing_mode   = "provisioned"
+    write_capacity = 1
+    read_capacity  = 1
   }
 }
