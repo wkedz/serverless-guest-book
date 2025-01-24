@@ -11,13 +11,6 @@ api_gateway_route_post = {
 lambda_payload_version = "2.0"
 
 # Buckets
-main_bucket_name = "frontend-terraform-demo"
-main_bucket_public_access_block = {
-  block_public_acls       = true
-  block_public_policy     = false
-  ignore_public_acls      = true
-  restrict_public_buckets = false
-}
 application = "client"
 
 # Roles
@@ -39,5 +32,25 @@ dynamodb_tables = {
     billing_mode   = "provisioned"
     write_capacity = 1
     read_capacity  = 1
+  }
+}
+
+s3_buckets = {
+  frontend-terraform-demo = {
+    block_public_acls       = true
+    block_public_policy     = false
+    ignore_public_acls      = true
+    restrict_public_buckets = false
+    bucket_policy = {
+      AllowPublic = {
+        effect    = "Allow"
+        actions   = ["s3:GetObject"]
+        resources = ["arn:aws:s3:::frontend-terraform-demo/*"]
+        principals = {
+          #type = identifiers
+          "*" = ["*"]
+        }
+      }
+    }
   }
 }

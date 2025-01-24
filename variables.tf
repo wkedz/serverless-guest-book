@@ -35,31 +35,6 @@ variable "api_gateway_route_post" {
   description = "POST route of API Gateway"
 }
 
-# Buckets
-variable "main_bucket_name" {
-  type        = string
-  description = "Name of the bucket storing frontend data"
-  default     = "frontend-terraform-demo"
-  nullable    = false
-}
-
-variable "main_bucket_public_access_block" {
-  type = object({
-    block_public_acls       = bool
-    block_public_policy     = bool
-    ignore_public_acls      = bool
-    restrict_public_buckets = bool
-  })
-  description = "Public access policy of main s3 bucket"
-  default = {
-    block_public_acls       = true
-    block_public_policy     = false
-    ignore_public_acls      = true
-    restrict_public_buckets = false
-  }
-  nullable = false
-}
-
 variable "application" {
   type = string
 }
@@ -78,5 +53,20 @@ variable "dynamodb_tables" {
     billing_mode   = string
     read_capacity  = number
     write_capacity = number
+  }))
+}
+
+variable "s3_buckets" {
+  type = map(object({
+    block_public_acls       = bool
+    block_public_policy     = bool
+    ignore_public_acls      = bool
+    restrict_public_buckets = bool
+    bucket_policy = optional(map(object({
+      effect     = string
+      actions    = set(string)
+      resources  = set(string)
+      principals = map(set(string))
+    })))
   }))
 }
