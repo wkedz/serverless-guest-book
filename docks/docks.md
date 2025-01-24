@@ -208,3 +208,255 @@ This happend when we create a module with iam policy.
 # Display output of main 
 
 In order to display output of our iac, we need to define outputs.tf which contains all output variables that will be show after plan. It can be then used. This output will also be save in state file. 
+
+# Advanced topics
+
+## Block moved
+
+This block is usefull when we have a resource, and we want to move its state into different resource localy. For example when we have bucket test, and we change its name to test2. Terraform would like to create test2, and remove test. 
+
+In order to avoid it, we need to declare moved block:
+
+```tf
+moved {
+  from = aws_s3_bucket.test
+  to = aws_s3_bucket.test2
+}
+```
+
+After apply, we can remove this block from Terraform.
+
+## For loop
+
+This is a special loop, that will not create resources like count, and for_each. Instead it is used for creating structures from other structures. For example 
+
+```tf
+locals {
+  test_for ={
+    res1 = {
+      boolean = true
+      str = "res1"
+    }
+    res2 = {
+      boolean = false
+      str = "res2"
+    }
+    res3 = {
+      boolean = true
+      str = "res3"
+    }    
+  }
+}
+
+output "test_for" {
+  value = [for k, v in local.test_for : k]
+}
+
+output "test_for_map" {
+  value = {for k,v in local.test_for : k => { b = v.boolean, str = v.str }}
+}
+
+output "test_for_map_2" {
+  value = {for k,v in local.test_for : k => v.str }
+}
+
+output "test_for_if" {
+  value = {for k,v in local.test_for : k => v.str if v.boolean }
+}
+```
+
+## Target flag -target="RESOURCE_NAME"
+
+This is a special flag that we can pass to plan (and apply if used with plan). It will select a target resources that terraform will create (even if we have many resources). This will also create any dependend resources that are needed by target resource. 
+
+We can use multiple flags -target, at single run.
+
+```bash
+terraform plan/apply -target='RESOURCE_NAME' -target='RESOURCE_NAME'
+```
+
+## Taint command
+
+This command is used to mark resource as damaged. It will force Terraform to replace it in the next run. In `taint` we set a special flag on resource that will change state file. In order to set resource as taint, we need to run :
+
+```bash
+terraform taint RESOURCE_NAME
+```
+
+## Replace flag
+
+This flag is very similar to `taint` command, but it will not modify state file, but replace resource on-fly. This is usefull when we have multiple operators working on infrastructure. 
+
+
+```bash
+terraform plan/apply -replace='RESOURCE_NAME' -replace='RESOURCE_NAME'
+```
+
+## Paths
+
+We can get access to paths:
+
+```tf
+output "path_module" {
+  value = path.module
+}
+
+output "path_root" {
+  value = path.root
+}
+
+output "path_cwd" {
+  value = path.cwd
+}
+```
+
+## Variables validation
+
+We can validate user input. In order to do that we need to put `validation` block into `variable` block. For example:
+
+```tf
+variable "some_variable" {
+  ...
+  validation {
+    error_message = "SOME ERROR MESSAGE" -> Error message must start with capitol letter, and ends with .|!|? mark
+    condifiont = var.some_variable != 1 BOOL CONDITION - false -> will raise error
+  }
+  validation {
+    WE CAN HAVE MULTIPLE VALIDATION BLOCKS
+  }
+}
+```
+
+Block `validation` can only refer to the variable block, that it is used. It canno refer to other variable. In order to have dependencies we need to make precondition block in `resource`
+
+## Import command
+
+This command is used for importing handmade infrastructure components into our local state. It will allows to manage it by using Terraform. 
+
+## Lifecycle
+
+We can manipulate lifecycle of the resource by using `lifecycle` block in the `resource`. For example 
+
+```tf
+
+resource "aws_s3_bucket" "lifecycle" {
+  ...
+
+  lifecycle {
+    prevent_destroy = true       -> this will prevent from destroying this resource. if we mark it with `taint` we will get an error.
+                                    this flag will not be stored in stat file, so if we remove this block, we will be able to remove this resource
+    create_before_destroy = true -> this flag will tell Terraform to first create resource, before removing it, this can increase HA, because we will
+                                    have resource created first.
+    ignore_changes = [ attribute_of_resource ] -> this flag will tell Terraform to ignore changes of given attribute.
+
+    replace_triggered_by = [ other_resource_namr ] -> this will force changes on this resource, because we  made changes to other_resource_namr
+
+    precondition {
+      Checks condition before applying
+      error_message = "THIS CAN BE ANY PARTICULAR MESSAGE (NOT LIKE IN VALIDATION)."
+      condition = we can refer here to any particular attribute from other resources, but we cannot refer to Self. Refer to the attribute 
+                  that are know at planing, because those resources are known, for example for s3 bucket attribute is known, but id will be
+                  known after apply.
+    }
+
+    postcondition {
+      Checks condition after applying, in this block, we can refer to self
+      error_message = "THIS CAN BE ANY PARTICULAR MESSAGE (NOT LIKE IN VALIDATION)."
+      condition = self.attribute = some_logic
+    }
+  }
+}
+```
+
+## Multiregion
+
+We can select region in which we will deploy our resources. In order to do that, we need to declare another `provider` block, and give it an `alias` attribute.
+
+```tf
+
+provider "aws" {
+  region = "eu-west-3"
+  alias = "paris"
+}
+```
+
+Now, we can use it in any resource/module block. Those blocks has an optional attribute `provider`. For example 
+
+```tf
+module {
+
+
+  providers = {
+    aws = aws.paris
+  }
+}
+```
+
+Now, this module will be created in aws.paris region.
+
+## Provisioners local-exec, file and remote-exec
+
+We can apply custom scripts on created resouce by using `provisioner` block. We have the following block:
+* local-exec - this will execute commands locally,
+* file - this will upload given file to target resource which is defined by `connection` block,
+* remote-exec - this will execute custom commands on target resource which is defined by `connection` block, we can use `self` here.
+
+Providers block do not change state file of Terraform, so in order to perform it, we need to taint existing resource, or create new one with provisioner block. 
+
+```tf
+provisioner "local-exec" {
+  command = "echo 'Some custom command.'"
+}
+
+connection {
+  type = 
+  host =
+  user = 
+  private_key = file(path to id_rsa)
+}
+
+provisioner "file" {
+  source = path_to_file
+  destination = where to put file
+}
+
+provisioner "remote-exec" {
+  inline = ["echo 'some other command executed remotly."]
+}
+```
+
+## Null_resource and null_data_source
+
+Resource `null_resource` is a special type of resource, that is provided by null provider. It allow us to create dangling resource, that can be use to perform some action, but not to create a resource, on the cloud (thats why it is called null). This resource block has a special attribure `triggers` that is a map, that accepts any particula values, that if change will force teraform to recreate null_resource. For example:
+
+```tf
+resource "null_resource" "null" {
+  triggers = {
+    change = some_value
+  }
+
+  provisioner "local-exec" {
+    command = SOME_COMMAND
+  }
+}
+```
+
+This resource will perform local-exec.command each time if `triggers` change. The main benefit of this, is that stat of this resource is store in state file. So we follow any changes to `triggers.change` value.
+
+Another usefull block is `null_data_source`. This data clock allows us to get any articula input, and use it as output. For example:
+
+```tf
+data "null_data_source" "null" {
+  inputs = {
+    file = file("some_file.txt")
+  }
+}
+
+output "null_data_source" {
+  value = data.null_data_source.null.outputs.file
+}
+```
+
+Now we can put any inputs to `data.null_data_source.null` and print it to `null_data_source.value`
+
+Since Terraform 1.4  there is a `terraform_data` that has same functionalities as `null_resource` and `null_data_source`
