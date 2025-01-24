@@ -8,11 +8,6 @@ variable "cors_origins" {
   default = null
 }
 
-variable "lambda_invoke_arn" {
-  type     = string
-  nullable = false
-}
-
 variable "lambda_payload_version" {
   type     = string
   nullable = false
@@ -20,11 +15,11 @@ variable "lambda_payload_version" {
 }
 
 variable "routes" {
-  type = set(string)
+  type     = set(string)
   nullable = false
 }
 
 variable "lambda_name" {
-  type = string
+  type     = string
   nullable = false
 }

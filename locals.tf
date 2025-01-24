@@ -46,7 +46,7 @@ locals {
       cors_origins = [
         "http://${module.s3_website_configuration["frontend-terraform-demo"].website_endpoint}"
       ]
-      lambda_invoke_arn = module.lambda["backend"].invoke_arn
+      lambda_name = "backend"
       lambda_payload_version = var.lambda_payload_version
       routes = ["GET /", "POST /"]
     }

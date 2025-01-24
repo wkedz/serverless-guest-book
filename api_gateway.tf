@@ -5,7 +5,8 @@ module "api_gateway" {
 
   api_gateway_name = each.key
   cors_origins = each.value.cors_origins
-  lambda_invoke_arn = each.value.lambda_invoke_arn
+  lambda_name = each.value.lambda_name
   lambda_payload_version = each.value.lambda_payload_version
   routes = each.value.routes
 }
+
