@@ -3,7 +3,7 @@ resource "aws_apigatewayv2_api" "api" {
   protocol_type = "HTTP"
   cors_configuration {
     allow_origins = [
-      "http://${aws_s3_bucket_website_configuration.website.website_endpoint}"
+      "http://${module.s3_website_configuration["frontend-terraform-demo"].website_endpoint}"
     ]
   }
 }

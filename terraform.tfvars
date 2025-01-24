@@ -10,9 +10,6 @@ api_gateway_route_post = {
 }
 lambda_payload_version = "2.0"
 
-# Buckets
-application = "client"
-
 # Roles
 iam_roles = {
   backend-lambda-role = {
@@ -52,5 +49,12 @@ s3_buckets = {
         }
       }
     }
+  }
+}
+
+websites = {
+  frontend-terraform-demo = {
+    index_name = "index.html"
+    website_files_directory = "./frontend/build"
   }
 }

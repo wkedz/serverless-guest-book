@@ -1,18 +1,11 @@
-resource "aws_s3_object" "name" {
-  for_each     = fileset("./frontend/build", "**")
-  bucket       = module.s3_bucket["frontend-terraform-demo"].bucket_id
-  key          = each.value
-  source       = "./frontend/build/${each.value}"
-  etag         = filemd5("./frontend/build/${each.value}")
-  content_type = lookup(local.mime_types, regex("[^.]+$", each.value), null)
-}
+module "s3_website_configuration" {
+  source = "./modules/s3_website_deployment"
 
-resource "aws_s3_bucket_website_configuration" "website" {
-  bucket = module.s3_bucket["frontend-terraform-demo"].bucket_id
+  for_each = var.websites
 
-  index_document {
-    suffix = var.application == "client" ? "index.html" : "index2.html"
-  }
+  bucket_id = module.s3_bucket[each.key].bucket_id
+  index_name = each.value.index_name
+  website_files_directory = each.value.website_files_directory
 }
 
 module "s3_bucket" {

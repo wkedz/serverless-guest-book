@@ -35,10 +35,6 @@ variable "api_gateway_route_post" {
   description = "POST route of API Gateway"
 }
 
-variable "application" {
-  type = string
-}
-
 variable "iam_roles" {
   type = map(object({
     trust_relationship_principals = map(set(string))
@@ -68,5 +64,12 @@ variable "s3_buckets" {
       resources  = set(string)
       principals = map(set(string))
     })))
+  }))
+}
+
+variable "websites" {
+  type = map(object({
+    index_name = string
+    website_files_directory = string
   }))
 }
