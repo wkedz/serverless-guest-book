@@ -36,8 +36,19 @@ locals {
       permissions = {
         statement_id = "HTTPApiInvoke"
         principal    = "apigateway.amazonaws.com"
-        source_arn   = "${aws_apigatewayv2_api.api.execution_arn}/*"
+        source_arn   = "${module.api_gateway["backend"].execution_arn}/*"
       }
+    }
+  }
+
+  api_gateways = {
+    backend = {
+      cors_origins = [
+        "http://${module.s3_website_configuration["frontend-terraform-demo"].website_endpoint}"
+      ]
+      lambda_invoke_arn = module.lambda["backend"].invoke_arn
+      lambda_payload_version = var.lambda_payload_version
+      routes = ["GET /", "POST /"]
     }
   }
 }
